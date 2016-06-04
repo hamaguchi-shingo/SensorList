@@ -1,4 +1,4 @@
-package jp.co.megachips.sensorlist;
+package jp.co.pitta.sensorlist;
 
 import android.app.Activity;
 import android.content.Context;
