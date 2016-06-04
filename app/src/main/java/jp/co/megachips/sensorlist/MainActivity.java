@@ -16,17 +16,19 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements SensorEventListener {
 
-    private final int maxSizeOfdisplayData = 4;
+    private final int maxSizeOfdisplayData = 1;
 
     private Spinner mSensorDelaySpinner;
     private Spinner[] mSensorNameSpinner     = new Spinner[maxSizeOfdisplayData];
@@ -42,15 +44,18 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
     private String[] mInputSensorTypeName = new String[maxSizeOfdisplayData];
     private String mInputSensorDelay;
 
+    private LinearLayout mSensorDisplayLayout;
+    private Activity mActivity;
+    private SensorDisplayBase mDisplay;
 
     String[] getListSensorTypeName(List<Sensor> sensorTypeList) {
         List<String> str = new ArrayList<>();
 
-        str.add(0, "null");
-
         for(int i = 0; i < sensorTypeList.size(); i++) {
-            str.add(i + 1, sensorTypeList.get(i).getName());
+            str.add(i, sensorTypeList.get(i).getStringType());
         }
+        Collections.sort(str);
+        str.add(0, "null");
         return str.toArray(new String[0]);
     }
 
@@ -65,11 +70,90 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         spinner.setAdapter(adapter);
     }
 
+    void changeLayoutFile(String sensorType) {
+        mSensorDisplayLayout.removeAllViews();
+
+        switch(sensorType) {
+            case Sensor.STRING_TYPE_ACCELEROMETER :
+                getLayoutInflater().inflate(R.layout.android_sensor_accelerometer, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayAccel();
+                break;
+            case Sensor.STRING_TYPE_GAME_ROTATION_VECTOR :
+                getLayoutInflater().inflate(R.layout.android_sensor_game_rotation_vector, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayGameRotationVector();
+                break;
+            case Sensor.STRING_TYPE_GEOMAGNETIC_ROTATION_VECTOR :
+                getLayoutInflater().inflate(R.layout.android_sensor_geomagnetic_rotation_vector, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayGeomagneticRotationVector();
+                break;
+            case Sensor.STRING_TYPE_GRAVITY :
+                getLayoutInflater().inflate(R.layout.android_sensor_gravity, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayGravity();
+                break;
+            case Sensor.STRING_TYPE_GYROSCOPE :
+                getLayoutInflater().inflate(R.layout.android_sensor_gyroscope, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayGyro();
+                break;
+            case Sensor.STRING_TYPE_GYROSCOPE_UNCALIBRATED :
+                getLayoutInflater().inflate(R.layout.android_sensor_gyroscope_uncalibrated, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayGyroUncalib();
+                break;
+            case Sensor.STRING_TYPE_LIGHT :
+                getLayoutInflater().inflate(R.layout.android_sensor_light, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayLight();
+                break;
+            case Sensor.STRING_TYPE_LINEAR_ACCELERATION :
+                getLayoutInflater().inflate(R.layout.android_sensor_linear_acceleration, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayLinearAccel();
+                break;
+            case Sensor.STRING_TYPE_MAGNETIC_FIELD :
+                getLayoutInflater().inflate(R.layout.android_sensor_magnetic_field, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayMag();
+                break;
+            case Sensor.STRING_TYPE_MAGNETIC_FIELD_UNCALIBRATED :
+                getLayoutInflater().inflate(R.layout.android_sensor_magnetic_field_uncalibrated, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayMagUncalib();
+                break;
+            case Sensor.STRING_TYPE_PRESSURE :
+                getLayoutInflater().inflate(R.layout.android_sensor_pressure, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayPressure();
+                break;
+            case Sensor.STRING_TYPE_PROXIMITY :
+                getLayoutInflater().inflate(R.layout.android_sensor_proximity, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayProximity();
+                break;
+            case Sensor.STRING_TYPE_ROTATION_VECTOR :
+                getLayoutInflater().inflate(R.layout.android_sensor_rotation_vector, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayRotationVector();
+                break;
+            case Sensor.STRING_TYPE_SIGNIFICANT_MOTION :
+                getLayoutInflater().inflate(R.layout.android_sensor_significant_motion, mSensorDisplayLayout);
+                mDisplay = new SensorDisplaySignificantMotion();
+                break;
+            case Sensor.STRING_TYPE_STEP_COUNTER :
+                getLayoutInflater().inflate(R.layout.android_sensor_step_counter, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayStepCounter();
+                break;
+            case Sensor.STRING_TYPE_STEP_DETECTOR :
+                getLayoutInflater().inflate(R.layout.android_sensor_step_detector, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayStepDetector();
+                break;
+            default:
+                getLayoutInflater().inflate(R.layout.other_sensor, mSensorDisplayLayout);
+                mDisplay = new SensorDisplayOther();
+                break;
+
+        }
+
+        mDisplay.setUI(mActivity);
+
+    }
+
     Sensor searchSensor(String sensorTypeName, List<Sensor> sensorList) {
         Sensor sensor = null;
 
         for(int i = 0; i < sensorList.size(); i++) {
-            if(sensorTypeName.equals(sensorList.get(i).getName())) {
+            if(sensorTypeName.equals(sensorList.get(i).getStringType())) {
                 sensor = sensorList.get(i);
             }
         }
@@ -101,20 +185,18 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         mSensorDelaySpinner  = (Spinner)findViewById(R.id.spinner_sensor_delay);
 
         mSensorNameSpinner[0] = (Spinner)findViewById(R.id.spinner_sensor_name_0);
-        mSensorNameSpinner[1] = (Spinner)findViewById(R.id.spinner_sensor_name_1);
-        mSensorNameSpinner[2] = (Spinner)findViewById(R.id.spinner_sensor_name_2);
-        mSensorNameSpinner[3] = (Spinner)findViewById(R.id.spinner_sensor_name_3);
 
         mSensorValueTextView[0] = (TextView)findViewById(R.id.text_view_sensor_data_0);
-        mSensorValueTextView[1] = (TextView)findViewById(R.id.text_view_sensor_data_1);
-        mSensorValueTextView[2] = (TextView)findViewById(R.id.text_view_sensor_data_2);
-        mSensorValueTextView[3] = (TextView)findViewById(R.id.text_view_sensor_data_3);
 
         mSensorControlButton = (Button)findViewById(R.id.button_sensor_control);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         mSensorTypeList = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+
+        mSensorDisplayLayout =  (LinearLayout)findViewById(R.id.layout_display_data);
+
+        mActivity = this;
 
         for(int i = 0; i < maxSizeOfdisplayData; i++) {
             addSpinnerMenu(mSensorNameSpinner[i], getListSensorTypeName(mSensorTypeList));
@@ -129,7 +211,9 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
                 @Override
                 public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                     Spinner spinner = (Spinner) arg0;
+                    changeLayoutFile((String) spinner.getSelectedItem());
                     mInputSensorTypeName[selectNumber] = (String) spinner.getSelectedItem();
+
                 }
 
                 @Override
@@ -196,22 +280,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        String str;
-
-        str = String.valueOf(event.timestamp) + " ";
-
-        for(int i = 0; i < event.values.length; i++) {
-            str = str + String.valueOf(event.values[i]) + " ";
-        }
-
-        str = str + "\n";
-
-        for(int i = 0; i < maxSizeOfdisplayData; i++) {
-            if(event.sensor.getName().equals(mInputSensorTypeName[i])) {
-                mSensorValueTextView[i].setText(str);
-                break;
-            }
-        }
+        mDisplay.display(event);
 
     }
 
@@ -222,22 +291,7 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     class TriggerListener extends TriggerEventListener {
         public void onTrigger(TriggerEvent event) {
-            String str;
-
-            str = String.valueOf(event.timestamp) + " ";
-
-            for(int i = 0; i < event.values.length; i++) {
-                str = str + String.valueOf(event.values[i]) + " ";
-            }
-
-            str = str + "\n";
-
-            for(int i = 0; i < maxSizeOfdisplayData; i++) {
-                if(event.sensor.getName().equals(mInputSensorTypeName[i])) {
-                    mSensorValueTextView[i].setText(str);
-                    break;
-                }
-            }
+            mDisplay.display(event);
         }
     }
 
