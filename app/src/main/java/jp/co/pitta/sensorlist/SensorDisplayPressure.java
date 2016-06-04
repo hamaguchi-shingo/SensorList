@@ -1,4 +1,4 @@
-package jp.co.megachips.sensorlist;
+package jp.co.pitta.sensorlist;
 
 import android.app.Activity;
 import android.hardware.SensorEvent;
@@ -8,18 +8,16 @@ import android.widget.TextView;
 /**
  * Created by shingo on 2016/06/02.
  */
-public class SensorDisplayGyro extends SensorDisplayBase {
+public class SensorDisplayPressure extends SensorDisplayBase {
 
     TextView timestampTextView;
-    TextView valueTextView[] = new TextView[3];
+    TextView valueTextView[] = new TextView[1];
 
     @Override
     public void setUI(Activity activity) {
-        timestampTextView = (TextView)activity.findViewById(R.id.gyroTimestampTextView);
+        timestampTextView = (TextView)activity.findViewById(R.id.pressureTimestampTextView);
 
-        valueTextView[0] = (TextView)activity.findViewById(R.id.gyroTextView0);
-        valueTextView[1] = (TextView)activity.findViewById(R.id.gyroTextView1);
-        valueTextView[2] = (TextView)activity.findViewById(R.id.gyroTextView2);
+        valueTextView[0] = (TextView)activity.findViewById(R.id.pressureTextView0);
     }
 
     @Override
