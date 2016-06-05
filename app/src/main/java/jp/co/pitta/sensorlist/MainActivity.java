@@ -72,74 +72,57 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
 
     void changeLayoutFile(String sensorType) {
         mSensorDisplayLayout.removeAllViews();
-
+        getLayoutInflater().inflate(R.layout.other_sensor, mSensorDisplayLayout);
         switch(sensorType) {
             case Sensor.STRING_TYPE_ACCELEROMETER :
-                getLayoutInflater().inflate(R.layout.android_sensor_accelerometer, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayAccel();
                 break;
             case Sensor.STRING_TYPE_GAME_ROTATION_VECTOR :
-                getLayoutInflater().inflate(R.layout.android_sensor_game_rotation_vector, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayGameRotationVector();
                 break;
             case Sensor.STRING_TYPE_GEOMAGNETIC_ROTATION_VECTOR :
-                getLayoutInflater().inflate(R.layout.android_sensor_geomagnetic_rotation_vector, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayGeomagneticRotationVector();
                 break;
             case Sensor.STRING_TYPE_GRAVITY :
-                getLayoutInflater().inflate(R.layout.android_sensor_gravity, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayGravity();
                 break;
             case Sensor.STRING_TYPE_GYROSCOPE :
-                getLayoutInflater().inflate(R.layout.android_sensor_gyroscope, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayGyro();
                 break;
             case Sensor.STRING_TYPE_GYROSCOPE_UNCALIBRATED :
-                getLayoutInflater().inflate(R.layout.android_sensor_gyroscope_uncalibrated, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayGyroUncalib();
                 break;
             case Sensor.STRING_TYPE_LIGHT :
-                getLayoutInflater().inflate(R.layout.android_sensor_light, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayLight();
                 break;
             case Sensor.STRING_TYPE_LINEAR_ACCELERATION :
-                getLayoutInflater().inflate(R.layout.android_sensor_linear_acceleration, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayLinearAccel();
                 break;
             case Sensor.STRING_TYPE_MAGNETIC_FIELD :
-                getLayoutInflater().inflate(R.layout.android_sensor_magnetic_field, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayMag();
                 break;
             case Sensor.STRING_TYPE_MAGNETIC_FIELD_UNCALIBRATED :
-                getLayoutInflater().inflate(R.layout.android_sensor_magnetic_field_uncalibrated, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayMagUncalib();
                 break;
             case Sensor.STRING_TYPE_PRESSURE :
-                getLayoutInflater().inflate(R.layout.android_sensor_pressure, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayPressure();
                 break;
             case Sensor.STRING_TYPE_PROXIMITY :
-                getLayoutInflater().inflate(R.layout.android_sensor_proximity, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayProximity();
                 break;
             case Sensor.STRING_TYPE_ROTATION_VECTOR :
-                getLayoutInflater().inflate(R.layout.android_sensor_rotation_vector, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayRotationVector();
                 break;
             case Sensor.STRING_TYPE_SIGNIFICANT_MOTION :
-                getLayoutInflater().inflate(R.layout.android_sensor_significant_motion, mSensorDisplayLayout);
                 mDisplay = new SensorDisplaySignificantMotion();
                 break;
             case Sensor.STRING_TYPE_STEP_COUNTER :
-                getLayoutInflater().inflate(R.layout.android_sensor_step_counter, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayStepCounter();
                 break;
             case Sensor.STRING_TYPE_STEP_DETECTOR :
-                getLayoutInflater().inflate(R.layout.android_sensor_step_detector, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayStepDetector();
                 break;
             default:
-                getLayoutInflater().inflate(R.layout.other_sensor, mSensorDisplayLayout);
                 mDisplay = new SensorDisplayOther();
                 break;
 
