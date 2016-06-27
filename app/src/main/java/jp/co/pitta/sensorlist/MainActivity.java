@@ -1,287 +1,145 @@
 package jp.co.pitta.sensorlist;
 
 import android.app.Activity;
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.hardware.TriggerEvent;
-import android.hardware.TriggerEventListener;
-import android.support.v7.app.ActionBarActivity;
+import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.view.View.OnClickListener;
-import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-public class MainActivity extends ActionBarActivity implements SensorEventListener {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, FragmentSensorListener, FragmentSensorDialogListener {
 
-    private final int maxSizeOfdisplayData = 1;
-
-    private Spinner mSensorDelaySpinner;
-    private Spinner[] mSensorNameSpinner     = new Spinner[maxSizeOfdisplayData];
-    private TextView[] mSensorValueTextView  = new TextView[maxSizeOfdisplayData];
-
-    private Button mSensorControlButton;
-
-    private SensorManager mSensorManager;
-    private List<Sensor> mSensorTypeList;
-    private Sensor[] mSensor = new Sensor[maxSizeOfdisplayData];
-    private final TriggerEventListener mTriggerListener = new TriggerListener();
-
-    private String[] mInputSensorTypeName = new String[maxSizeOfdisplayData];
-    private String mInputSensorDelay;
-
-    private LinearLayout mSensorDisplayLayout;
-    private Activity mActivity;
-    private SensorDisplayBase mDisplay;
-
-    String[] getListSensorTypeName(List<Sensor> sensorTypeList) {
-        List<String> str = new ArrayList<>();
-
-        for(int i = 0; i < sensorTypeList.size(); i++) {
-            str.add(i, sensorTypeList.get(i).getStringType());
-        }
-        Collections.sort(str);
-        str.add(0, "null");
-        return str.toArray(new String[0]);
-    }
-
-    String[] getListSensorDelayName() {
-        String[] str = {"Normal", "UI", "Game", "Fastest"};
-
-        return str;
-    }
-    void addSpinnerMenu(Spinner spinner, String[] str) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, str);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-    }
-
-    void changeLayoutFile(String sensorType) {
-        mSensorDisplayLayout.removeAllViews();
-        getLayoutInflater().inflate(R.layout.other_sensor, mSensorDisplayLayout);
-        switch(sensorType) {
-            case Sensor.STRING_TYPE_ACCELEROMETER :
-                mDisplay = new SensorDisplayAccel();
-                break;
-            case Sensor.STRING_TYPE_GAME_ROTATION_VECTOR :
-                mDisplay = new SensorDisplayGameRotationVector();
-                break;
-            case Sensor.STRING_TYPE_GEOMAGNETIC_ROTATION_VECTOR :
-                mDisplay = new SensorDisplayGeomagneticRotationVector();
-                break;
-            case Sensor.STRING_TYPE_GRAVITY :
-                mDisplay = new SensorDisplayGravity();
-                break;
-            case Sensor.STRING_TYPE_GYROSCOPE :
-                mDisplay = new SensorDisplayGyro();
-                break;
-            case Sensor.STRING_TYPE_GYROSCOPE_UNCALIBRATED :
-                mDisplay = new SensorDisplayGyroUncalib();
-                break;
-            case Sensor.STRING_TYPE_LIGHT :
-                mDisplay = new SensorDisplayLight();
-                break;
-            case Sensor.STRING_TYPE_LINEAR_ACCELERATION :
-                mDisplay = new SensorDisplayLinearAccel();
-                break;
-            case Sensor.STRING_TYPE_MAGNETIC_FIELD :
-                mDisplay = new SensorDisplayMag();
-                break;
-            case Sensor.STRING_TYPE_MAGNETIC_FIELD_UNCALIBRATED :
-                mDisplay = new SensorDisplayMagUncalib();
-                break;
-            case Sensor.STRING_TYPE_PRESSURE :
-                mDisplay = new SensorDisplayPressure();
-                break;
-            case Sensor.STRING_TYPE_PROXIMITY :
-                mDisplay = new SensorDisplayProximity();
-                break;
-            case Sensor.STRING_TYPE_ROTATION_VECTOR :
-                mDisplay = new SensorDisplayRotationVector();
-                break;
-            case Sensor.STRING_TYPE_SIGNIFICANT_MOTION :
-                mDisplay = new SensorDisplaySignificantMotion();
-                break;
-            case Sensor.STRING_TYPE_STEP_COUNTER :
-                mDisplay = new SensorDisplayStepCounter();
-                break;
-            case Sensor.STRING_TYPE_STEP_DETECTOR :
-                mDisplay = new SensorDisplayStepDetector();
-                break;
-            default:
-                mDisplay = new SensorDisplayOther();
-                break;
-
-        }
-
-        mDisplay.setUI(mActivity);
-
-    }
-
-    Sensor searchSensor(String sensorTypeName, List<Sensor> sensorList) {
-        Sensor sensor = null;
-
-        for(int i = 0; i < sensorList.size(); i++) {
-            if(sensorTypeName.equals(sensorList.get(i).getStringType())) {
-                sensor = sensorList.get(i);
-            }
-        }
-
-        return sensor;
-    }
-
-    int searchSensorDelay(String sensorDelay) {
-        int delay = 0;
-
-        if(sensorDelay.equals("Normal")) {
-            delay = SensorManager.SENSOR_DELAY_NORMAL;
-        } else if(sensorDelay.equals("UI")) {
-            delay = SensorManager.SENSOR_DELAY_UI;
-        } else if(sensorDelay.equals("Game")) {
-            delay = SensorManager.SENSOR_DELAY_GAME;
-        } else if(sensorDelay.equals("Fastest")) {
-            delay = SensorManager.SENSOR_DELAY_FASTEST;
-        }
-
-        return delay;
-    }
+    private Toolbar mToolbar;
+    private DrawerLayout mDrawer;
+    private ActionBarDrawerToggle mToggle;
+    private NavigationView mNavigationView;
+    private boolean mStateSensorListFlag;
+    private int mSelectSamplingTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mSensorDelaySpinner  = (Spinner)findViewById(R.id.spinner_sensor_delay);
+        mToolbar         = (Toolbar) findViewById(R.id.toolbar);
+        mDrawer          = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
 
-        mSensorNameSpinner[0] = (Spinner)findViewById(R.id.spinner_sensor_name_0);
+        mToggle = new ActionBarDrawerToggle(
+                MainActivity.this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mToggle.syncState();
 
-        mSensorValueTextView[0] = (TextView)findViewById(R.id.text_view_sensor_data_0);
+        mNavigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener)MainActivity.this);
 
-        mSensorControlButton = (Button)findViewById(R.id.button_sensor_control);
+        FragmentSensorList fragmentSensorList = new FragmentSensorList();
+        Bundle args = new Bundle();
+        args.putInt("samplingTime2", mSelectSamplingTime);
+        fragmentSensorList.setArguments(args);
 
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragmentSensorList, FragmentSensorList.class.getName());
+        transaction.commit();
 
-        mSensorTypeList = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+        mStateSensorListFlag = true;
+        mToolbar.setTitle("Sensor List");
+    }
 
-        mSensorDisplayLayout =  (LinearLayout)findViewById(R.id.layout_display_data);
+    @Override
+    public void onFragmentSamplingTimeDialog( int selectItem ) {
+        mSelectSamplingTime = selectItem;
 
-        mActivity = this;
+        FragmentSensorList fragmentSensorList = new FragmentSensorList();
+        Bundle args = new Bundle();
+        args.putInt("samplingTime2", mSelectSamplingTime);
+        fragmentSensorList.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragmentSensorList, FragmentSensorList.class.getName());
+        transaction.commit();
+    }
 
-        for(int i = 0; i < maxSizeOfdisplayData; i++) {
-            addSpinnerMenu(mSensorNameSpinner[i], getListSensorTypeName(mSensorTypeList));
-        }
+    @Override
+    public void onFragmentSensorListEvent(){
+        mToolbar.setTitle("Sensor List");
+        mStateSensorListFlag = true;
+    }
 
-        addSpinnerMenu(mSensorDelaySpinner, getListSensorDelayName());
-
-        for(int i = 0; i < maxSizeOfdisplayData; i++) {
-            final int selectNumber = i;
-
-            mSensorNameSpinner[i].setOnItemSelectedListener(new OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                    Spinner spinner = (Spinner) arg0;
-                    changeLayoutFile((String) spinner.getSelectedItem());
-                    mInputSensorTypeName[selectNumber] = (String) spinner.getSelectedItem();
-
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> arg0) {
-                    // TODO Auto-generated method stub
-                }
-            });
-        }
-
-        mSensorDelaySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                Spinner spinner = (Spinner) arg0;
-                mInputSensorDelay = (String) spinner.getSelectedItem();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-            }
-        });
-
-
-        mSensorControlButton.setOnClickListener(new OnClickListener() {
+    @Override
+    public void onFragmentSensorDisplayEvent( String sensorName ){
+        mToggle.setDrawerIndicatorEnabled(false);
+        mToolbar.setNavigationIcon(R.drawable.ic_action_back);
+        mToolbar.setTitle(sensorName);
+        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        mToggle.syncState();
+        mStateSensorListFlag = false;
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mSensorControlButton.getText().equals(getString(R.string.sensor_start))) {
-                    mSensorControlButton.setText(getString(R.string.sensor_stop));
+                mToggle.setDrawerIndicatorEnabled(true);
+                mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                mToggle = new ActionBarDrawerToggle(
+                        MainActivity.this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                mToggle.syncState();
+                mNavigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener)MainActivity.this);
 
-                    for(int i = 0; i < maxSizeOfdisplayData; i++) {
-                        mSensor[i] = searchSensor(mInputSensorTypeName[i], mSensorTypeList);
+                FragmentSensorList fragmentSensorList = new FragmentSensorList();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                Bundle args = new Bundle();
+                args.putInt("samplingTime2", mSelectSamplingTime);
+                fragmentSensorList.setArguments(args);
+                transaction.replace(R.id.fragment_container, fragmentSensorList, FragmentSensorList.class.getName());
+                transaction.commit();
 
-                        if (mSensor[i] != null) {
-                            if (mSensor[i].getType() == Sensor.TYPE_SIGNIFICANT_MOTION) {
-                                mSensorManager.requestTriggerSensor(mTriggerListener, mSensor[i]);
-                            } else {
-                                int sensorDelay = searchSensorDelay(mInputSensorDelay);
-                                mSensorManager.registerListener(MainActivity.this, mSensor[i], sensorDelay);
-                            }
-                        }
-                    }
-
-                    for(int i = 0; i < maxSizeOfdisplayData; i++) {
-                        mSensorValueTextView[i].setText("");
-                    }
-
-                } else {
-                    mSensorControlButton.setText(getString(R.string.sensor_start));
-
-                    for(int i = 0; i < maxSizeOfdisplayData; i++) {
-                        if (mSensor[i] != null) {
-                            if (mSensor[i].getType() == Sensor.TYPE_SIGNIFICANT_MOTION) {
-                                mSensorManager.cancelTriggerSensor(mTriggerListener, mSensor[i]);
-                            } else {
-                                mSensorManager.unregisterListener(MainActivity.this, mSensor[i]);
-                            }
-                        }
-                    }
-                }
+                mStateSensorListFlag = true;
+                mToolbar.setTitle("Sensor List");
             }
         });
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        mDisplay.display(event);
+    public void onBackPressed() {
 
-    }
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            } else {
+                if( mStateSensorListFlag == false ) {
+                    //super.onBackPressed();
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
+                    FragmentSensorList fragmentSensorList = new FragmentSensorList();
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    Bundle args = new Bundle();
+                    args.putInt("samplingTime2", mSelectSamplingTime);
+                    fragmentSensorList.setArguments(args);
+                    transaction.replace(R.id.fragment_container, fragmentSensorList, FragmentSensorList.class.getName());
+                    transaction.commit();
 
-    }
+                    mToolbar.setTitle("Sensor List");
+                    mToggle.setDrawerIndicatorEnabled(true);
+                    mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                    mToggle = new ActionBarDrawerToggle(
+                            MainActivity.this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                    mToggle.syncState();
+                    mNavigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) MainActivity.this);
+                    mStateSensorListFlag = true;
+                }
+            }
 
-    class TriggerListener extends TriggerEventListener {
-        public void onTrigger(TriggerEvent event) {
-            mDisplay.display(event);
-        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -298,6 +156,29 @@ public class MainActivity extends ActionBarActivity implements SensorEventListen
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+            FragmentManager manager = getFragmentManager();
+            FragmentSamplingTimeDialog dialog = new FragmentSamplingTimeDialog();
+
+            Bundle bundle = new Bundle();
+            bundle.putInt(FragmentSamplingTimeDialog.SELECTED, mSelectSamplingTime);
+            dialog.setArguments(bundle);
+            dialog.show(manager, "Dialog");
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
 }

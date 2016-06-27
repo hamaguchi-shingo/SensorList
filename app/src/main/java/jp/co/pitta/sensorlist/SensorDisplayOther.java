@@ -3,6 +3,7 @@ package jp.co.pitta.sensorlist;
 import android.app.Activity;
 import android.hardware.SensorEvent;
 import android.hardware.TriggerEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TableRow;
@@ -13,24 +14,25 @@ import android.widget.TextView;
  */
 public class SensorDisplayOther extends SensorDisplayBase {
 
-    Activity mActivity;
     ViewGroup mViewGroup;
     TableRow mTimestampTableRow;
     TableRow mSensorDataTableRow[];
     boolean initFlag;
+    LayoutInflater mInflater;
 
     @Override
-    public void setUI(Activity activity) {
-        mActivity  = activity;
-        mViewGroup = (ViewGroup)mActivity.findViewById(R.id.tableLayout);
+    public void setUI(View view, LayoutInflater inflater) {
 
-        mActivity.getLayoutInflater().inflate(R.layout.table_raw, mViewGroup);
+        mViewGroup = (ViewGroup)view.findViewById(R.id.tableLayout);
+
+        inflater.inflate(R.layout.table_sensor_raw, mViewGroup);
         mTimestampTableRow = (TableRow)mViewGroup.getChildAt(0);
 
         ((TextView)mTimestampTableRow.getChildAt(0)).setText("timestamp");
         ((TextView)mTimestampTableRow.getChildAt(2)).setText("ns");
 
         initFlag = false;
+        mInflater = inflater;
     }
 
     @Override
@@ -39,7 +41,7 @@ public class SensorDisplayOther extends SensorDisplayBase {
         if(initFlag == false) {
             mSensorDataTableRow = new TableRow[event.values.length];
             for(int i = 0; i < event.values.length; i++){
-                mActivity.getLayoutInflater().inflate(R.layout.table_raw, mViewGroup);
+                mInflater.inflate(R.layout.table_sensor_raw, mViewGroup);
                 mSensorDataTableRow[i] = (TableRow)mViewGroup.getChildAt(i + 1);
                 String str = "values["+ String.valueOf(i) + "]";
                 ((TextView)mSensorDataTableRow[i].getChildAt(0)).setText(str);
