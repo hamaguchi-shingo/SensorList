@@ -1,8 +1,38 @@
 <resources>
-    <string name="app_name">Sensor List</string>
+    <string name="app_name">SensorList</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
+    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="sensor_name">Sensor name</string>
+    <string name="sensor_delay">Sensor delay</string>
+    <string name="sensor_data">Sensor data</string>
+    <string name="sensor_start">START</string>
+    <string name="sensor_stop">STOP</string>
+    <string name="sensor_timestamp">timestamp</string>
+    <string name="sensor_x_axis">x-axis</string>
+    <string name="sensor_y_axis">y-axis</string>
+    <string name="sensor_z_axis">z-axis</string>
+    <string name="sensor_x_uncalib">x_uncalib</string>
+    <string name="sensor_y_uncalib">y_uncalib</string>
+    <string name="sensor_z_uncalib">z_uncalib</string>
+    <string name="sensor_x_bias">x_bias</string>
+    <string name="sensor_y_bias">y_bias</string>
+    <string name="sensor_z_bias">z_bias</string>
+    <string name="sensor_x_drift">x_drift</string>
+    <string name="sensor_y_drift">y_drift</string>
+    <string name="sensor_z_drift">z_drift</string>
+    <string name="sensor_value_0">value[0]</string>
+    <string name="sensor_value_1">value[1]</string>
+    <string name="sensor_value_2">value[2]</string>
+    <string name="sensor_value_3">value[3]</string>
+    <string name="sensor_value_4">value[4]</string>
+    <string name="sensor_value_5">value[5]</string>
+    <string name="sensor_accel_unit">m/s^2</string>
+    <string name="sensor_mag_unit">uT</string>
+    <string name="sensor_gyro_unit">rad/s</string>
+    <string name="sensor_light_unit">lux</string>
+    <string name="sensor_pressure_unit">hPa</string>
+    <string name="sensor_proximity_unit">cm</string>
+    <string name="sensor_ambient_temperture_unit">degree Celsius</string>
+    <string name="sensor_timestamp_unit">ns</string>
 </resources>
