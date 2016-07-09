@@ -23,10 +23,11 @@ import java.util.List;
 public class FragmentSensorDisplay extends Fragment implements SensorEventListener {
 
     View mView;
-    LayoutInflater mInflater;
     SensorManager mSensorManager;
     Sensor mSensor;
-    SensorDisplayBase mSensorDisplay;
+    //SensorDisplayBase mSensorDisplay;
+    SensorDisplay mSensorDisplay;
+
     private FragmentSensorListener mListener;
     FragmentSensorDisplay value;
     TriggerEventListener mTriggerListener = new TriggerListener();
@@ -53,7 +54,8 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
             }
         });
 
-        mInflater = inflater;
+        mSensorDisplay = new SensorDisplay(mView, inflater);
+
 
         int type = 0;
         String strType = getArguments().getString("sensorName");
@@ -71,8 +73,9 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
             }
         }
 
-        mSensorDisplay = getSensorDisplay(type);
-        mSensorDisplay.setUI(mView, mInflater);
+        setUnitTable(type);
+       // mSensorDisplay = getSensorDisplay(type);
+        //mSensorDisplay.setUI(mView, mInflater);
 
         int sensorDelay;
         switch (selectItem) {
@@ -127,81 +130,82 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
-    SensorDisplayBase getSensorDisplay(int type) {
-
-        SensorDisplayBase sensorDisplay;
-
+    void setUnitTable( int type ) {
+        mSensorDisplay.setUnitTimestamp("ns");
+        mSensorDisplay.init();
         switch (type) {
 
             case Sensor.TYPE_ACCELEROMETER:
-                sensorDisplay = new SensorDisplayAccel();
+                mSensorDisplay.setUnitTitleName("x-axis", "y-axis", "z-axis");
+                mSensorDisplay.setUnitName("m/s^2", "m/s^2", "m/s^2");
                 break;
 
             case Sensor.TYPE_GAME_ROTATION_VECTOR:
-                sensorDisplay = new SensorDisplayGameRotationVector();
                 break;
 
             case Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR:
-                sensorDisplay = new SensorDisplayGeomagneticRotationVector();
                 break;
 
             case Sensor.TYPE_GRAVITY:
-                sensorDisplay = new SensorDisplayGravity();
+                mSensorDisplay.setUnitTitleName("x-axis", "y-axis", "z-axis");
+                mSensorDisplay.setUnitName("m/s^2", "m/s^2", "m/s^2");
                 break;
 
             case Sensor.TYPE_GYROSCOPE:
-                sensorDisplay = new SensorDisplayGyro();
+                mSensorDisplay.setUnitTitleName("x-axis", "y-axis", "z-axis");
+                mSensorDisplay.setUnitName("rad/s", "rad/s", "rad/s");
                 break;
 
             case Sensor.TYPE_GYROSCOPE_UNCALIBRATED:
-                sensorDisplay = new SensorDisplayGyroUncalib();
+                mSensorDisplay.setUnitTitleName("x-axis", "y-axis", "z-axis", "x-drift", "y-drift", "z-drift");
+                mSensorDisplay.setUnitName("rad/s",  "rad/s",  "rad/s",   "rad/s",   "rad/s",   "rad/s");
                 break;
 
             case Sensor.TYPE_LIGHT:
-                sensorDisplay = new SensorDisplayLight();
+                mSensorDisplay.setUnitTitleName("value[0]");
+                mSensorDisplay.setUnitName("lux");
                 break;
 
             case Sensor.TYPE_LINEAR_ACCELERATION:
-                sensorDisplay = new SensorDisplayLinearAccel();
+                mSensorDisplay.setUnitTitleName("x-axis", "y-axis", "z-axis");
+                mSensorDisplay.setUnitName("m/s^2", "m/s^2", "m/s^2");
                 break;
 
             case Sensor.TYPE_MAGNETIC_FIELD:
-                sensorDisplay = new SensorDisplayMag();
+                mSensorDisplay.setUnitTitleName("x-axis", "y-axis", "z-axis");
+                mSensorDisplay.setUnitName("uT",      "uT",     "uT");
                 break;
 
             case Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED:
-                sensorDisplay = new SensorDisplayMagUncalib();
+                mSensorDisplay.setUnitTitleName("x-axis", "y-axis", "z-axis", "x-bias", "y-bias", "z-bias");
+                mSensorDisplay.setUnitName("uT",      "uT",     "uT",      "",        "",        "");
                 break;
 
             case Sensor.TYPE_PRESSURE:
-                sensorDisplay = new SensorDisplayPressure();
+                mSensorDisplay.setUnitTitleName("value[0]");
+                mSensorDisplay.setUnitName("hPa");
                 break;
 
             case Sensor.TYPE_PROXIMITY:
-                sensorDisplay = new SensorDisplayProximity();
+                mSensorDisplay.setUnitTitleName("value[0]");
+                mSensorDisplay.setUnitName("cm");
                 break;
 
             case Sensor.TYPE_ROTATION_VECTOR:
-                sensorDisplay = new SensorDisplayRotationVector();
                 break;
 
             case Sensor.TYPE_SIGNIFICANT_MOTION:
-                sensorDisplay = new SensorDisplaySignificantMotion();
                 break;
 
             case Sensor.TYPE_STEP_COUNTER:
-                sensorDisplay = new SensorDisplayStepCounter();
                 break;
 
             case Sensor.TYPE_STEP_DETECTOR:
-                sensorDisplay = new SensorDisplayStepDetector();
                 break;
 
             default:
-                sensorDisplay = new SensorDisplayOther();
                 break;
         }
-
-        return sensorDisplay;
     }
+
 }
