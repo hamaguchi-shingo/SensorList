@@ -17,7 +17,7 @@ import android.view.View;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, FragmentSensorListener, FragmentSensorDialogListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FragmentSensorListener, FragmentNumberDialog.OnNumberDialogDoneListener {
 
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
@@ -25,11 +25,16 @@ public class MainActivity extends AppCompatActivity
     private NavigationView mNavigationView;
     private boolean mStateSensorListFlag;
     private int mSelectSamplingTime;
+    private int mSamplingTime;
+    private String mSamplingTimeUnit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mSamplingTime = 1;
+        mSamplingTimeUnit = "sec";
 
         mToolbar         = (Toolbar) findViewById(R.id.toolbar);
         mDrawer          = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -43,7 +48,9 @@ public class MainActivity extends AppCompatActivity
 
         FragmentSensorList fragmentSensorList = new FragmentSensorList();
         Bundle args = new Bundle();
-        args.putInt("samplingTime2", mSelectSamplingTime);
+        //args.putInt("samplingTime2", mSelectSamplingTime);
+        args.putInt("samplingTime", mSamplingTime);
+        args.putString("unitTime", mSamplingTimeUnit);
         fragmentSensorList.setArguments(args);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -55,16 +62,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFragmentSamplingTimeDialog( int selectItem ) {
-        mSelectSamplingTime = selectItem;
+    public void onDone( String title, String unit, int value ) {
+        mSamplingTime = value;
+        if( unit.equals("0") == true) {
+            mSamplingTimeUnit = "msec";
+        } else {
+            mSamplingTimeUnit = "sec";
+        }
 
         FragmentSensorList fragmentSensorList = new FragmentSensorList();
         Bundle args = new Bundle();
-        args.putInt("samplingTime2", mSelectSamplingTime);
+        //args.putInt("samplingTime2", mSelectSamplingTime);
+        args.putInt("samplingTime", mSamplingTime);
+        args.putString("unitTime", mSamplingTimeUnit);
+
         fragmentSensorList.setArguments(args);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragmentSensorList, FragmentSensorList.class.getName());
         transaction.commit();
+
     }
 
     @Override
@@ -94,7 +110,9 @@ public class MainActivity extends AppCompatActivity
                 FragmentSensorList fragmentSensorList = new FragmentSensorList();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 Bundle args = new Bundle();
-                args.putInt("samplingTime2", mSelectSamplingTime);
+                //args.putInt("samplingTime2", mSelectSamplingTime);
+                args.putInt("samplingTime", mSamplingTime);
+                args.putString("unitTime", mSamplingTimeUnit);
                 fragmentSensorList.setArguments(args);
                 transaction.replace(R.id.fragment_container, fragmentSensorList, FragmentSensorList.class.getName());
                 transaction.commit();
@@ -118,7 +136,9 @@ public class MainActivity extends AppCompatActivity
                     FragmentSensorList fragmentSensorList = new FragmentSensorList();
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     Bundle args = new Bundle();
-                    args.putInt("samplingTime2", mSelectSamplingTime);
+                    //args.putInt("samplingTime2", mSelectSamplingTime);
+                    args.putInt("samplingTime", mSamplingTime);
+                    args.putString("unitTime", mSamplingTimeUnit);
                     fragmentSensorList.setArguments(args);
                     transaction.replace(R.id.fragment_container, fragmentSensorList, FragmentSensorList.class.getName());
                     transaction.commit();
@@ -165,14 +185,17 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
+            FragmentNumberDialog myDiag = FragmentNumberDialog.newInstance(5, mSamplingTime, mSamplingTimeUnit, "SamplingTime");
+            myDiag.show(getFragmentManager(), "Diag");
+        //}
             // Handle the camera action
-            FragmentManager manager = getFragmentManager();
+            /*FragmentManager manager = getFragmentManager();
             FragmentSamplingTimeDialog dialog = new FragmentSamplingTimeDialog();
 
             Bundle bundle = new Bundle();
             bundle.putInt(FragmentSamplingTimeDialog.SELECTED, mSelectSamplingTime);
             dialog.setArguments(bundle);
-            dialog.show(manager, "Dialog");
+            dialog.show(manager, "Dialog");*/
 
         }
 
