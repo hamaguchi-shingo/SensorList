@@ -32,6 +32,9 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
     FragmentSensorDisplay value;
     TriggerEventListener mTriggerListener = new TriggerListener();
 
+    private int mSamplingTime;
+    private String mSamplingTimeUnit;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +62,8 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
 
         int type = 0;
         String strType = getArguments().getString("sensorName");
-        int selectItem = getArguments().getInt("samplingTime");
+        mSamplingTime = getArguments().getInt("samplingTime");
+        mSamplingTimeUnit = getArguments().getString("unitTime");
 
         SensorManager sensorManager = (SensorManager) mView.getContext().getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensorTypeList = sensorManager.getSensorList(Sensor.TYPE_ALL);
@@ -78,28 +82,17 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
         //mSensorDisplay.setUI(mView, mInflater);
 
         int sensorDelay;
-        switch (selectItem) {
-            case 0:
-                sensorDelay = SensorManager.SENSOR_DELAY_NORMAL;
-                break;
-            case 1:
-                sensorDelay = SensorManager.SENSOR_DELAY_UI;
-                break;
-            case 2:
-                sensorDelay = SensorManager.SENSOR_DELAY_GAME;
-                break;
-            case 3:
-                sensorDelay = SensorManager.SENSOR_DELAY_FASTEST;
-                break;
-            default:
-                sensorDelay = SensorManager.SENSOR_DELAY_NORMAL;
-                break;
+
+        if( mSamplingTimeUnit.equals("msec") ) {
+            sensorDelay = mSamplingTime * 1000;
+        } else {
+            sensorDelay = mSamplingTime * 1000 * 1000;
         }
 
         if (mSensor.getType() == Sensor.TYPE_SIGNIFICANT_MOTION) {
             mSensorManager.requestTriggerSensor(mTriggerListener, mSensor);
         } else {
-            mSensorManager.registerListener(this, mSensor, sensorDelay);
+            mSensorManager.registerListener(this, mSensor, sensorDelay, 0);
         }
 
         return mView;

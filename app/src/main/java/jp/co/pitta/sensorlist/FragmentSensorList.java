@@ -27,7 +27,9 @@ public class FragmentSensorList extends Fragment {
     private FragmentSensorListener mListener;
     private ListView mListView;
     private List<Sensor> mSensorTypeList;
-    private int mSelectItem;
+
+    private int mSamplingTime;
+    private String mSamplingTimeUnit;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,7 +41,8 @@ public class FragmentSensorList extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_sensor_list, container, false);
 
-        mSelectItem = getArguments().getInt("samplingTime2");
+        mSamplingTime = getArguments().getInt("samplingTime");
+        mSamplingTimeUnit = getArguments().getString("unitTime");
 
         ArrayList<SensorTitle> list = new ArrayList<>();
         SensorTitleAdapter adapter = new SensorTitleAdapter(mView.getContext().getApplicationContext());
@@ -76,7 +79,9 @@ public class FragmentSensorList extends Fragment {
                 fragmentSensorDisplay.setArguments(args);
                 mListener.onFragmentSensorDisplayEvent(item.getTitle());
 
-                args.putInt("samplingTime", mSelectItem);
+                args.putInt("samplingTime", mSamplingTime);
+                args.putString("unitTime", mSamplingTimeUnit);
+
                 fragmentSensorDisplay.setArguments(args);
 
                 transaction.replace(R.id.fragment_container, fragmentSensorDisplay, FragmentSensorDisplay.class.getName());
