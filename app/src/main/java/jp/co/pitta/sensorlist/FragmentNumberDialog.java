@@ -88,9 +88,14 @@ public class FragmentNumberDialog extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         LinearLayout linLayoutH = new LinearLayout(getActivity());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         linLayoutH.setLayoutParams(params);
+
+        TextView textView = new TextView(getActivity());
+        textView.setText(mTitle);
+        textView.setGravity(Gravity.CENTER);
 
         for (int i = numDials - 1; i >= 1; i--) {
             numPickers[i] = new NumberPicker(getActivity());
@@ -105,11 +110,11 @@ public class FragmentNumberDialog extends DialogFragment {
         numPickers[0].setMaxValue(1);
 
         String[] str;
-        str = new String[] {"msec", "sec"};
+        str = new String[]{"msec", "sec"};
 
-        numPickers[0].setDisplayedValues( str );
+        numPickers[0].setDisplayedValues(str);
 
-        if(mUnit.equals("sec")) {
+        if (mUnit.equals("sec")) {
             numPickers[0].setValue(1);
         } else {
             numPickers[0].setValue(0);
@@ -118,6 +123,7 @@ public class FragmentNumberDialog extends DialogFragment {
 
         LinearLayout linLayoutV = new LinearLayout(getActivity());
         linLayoutV.setOrientation(LinearLayout.VERTICAL);
+        linLayoutV.addView(textView);
         linLayoutV.addView(linLayoutH);
         Button okButton = new Button(getActivity());
         okButton.setOnClickListener(new View.OnClickListener() {
@@ -125,7 +131,11 @@ public class FragmentNumberDialog extends DialogFragment {
             public void onClick(View view) {
                 currentValue = getValue();
                 if (mListener != null) {
-                    mListener.onDone("samplingTime", Integer.toString(numPickers[0].getValue()), currentValue);
+                    if (mTitle.equals("samplingTime")) {
+                        mListener.onDone("samplingTime", Integer.toString(numPickers[0].getValue()), currentValue);
+                    } else {
+                        mListener.onDone("delayTime", Integer.toString(numPickers[0].getValue()), currentValue);
+                    }
                 }
                 ;
                 dismiss();
@@ -154,7 +164,7 @@ public class FragmentNumberDialog extends DialogFragment {
     }
 
     public interface OnNumberDialogDoneListener {
-        public void onDone(String title, String unit, int time );
+        public void onDone(String title, String unit, int time);
     }
 
 }

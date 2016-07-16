@@ -31,6 +31,9 @@ public class FragmentSensorList extends Fragment {
     private int mSamplingTime;
     private String mSamplingTimeUnit;
 
+    private int mDelayTime;
+    private String mDelayTimeUnit;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +46,9 @@ public class FragmentSensorList extends Fragment {
 
         mSamplingTime = getArguments().getInt("samplingTime");
         mSamplingTimeUnit = getArguments().getString("unitTime");
+
+        mDelayTime = getArguments().getInt("delayTime");
+        mDelayTimeUnit = getArguments().getString("unitDelayTime");
 
         ArrayList<SensorTitle> list = new ArrayList<>();
         SensorTitleAdapter adapter = new SensorTitleAdapter(mView.getContext().getApplicationContext());
@@ -81,6 +87,9 @@ public class FragmentSensorList extends Fragment {
 
                 args.putInt("samplingTime", mSamplingTime);
                 args.putString("unitTime", mSamplingTimeUnit);
+
+                args.putInt("delayTime", mDelayTime);
+                args.putString("unitDelayTime", mDelayTimeUnit);
 
                 fragmentSensorDisplay.setArguments(args);
 

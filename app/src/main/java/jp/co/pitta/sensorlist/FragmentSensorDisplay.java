@@ -35,6 +35,10 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
     private int mSamplingTime;
     private String mSamplingTimeUnit;
 
+    private int mDelayTime;
+    private String mDelayTimeUnit;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +69,9 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
         mSamplingTime = getArguments().getInt("samplingTime");
         mSamplingTimeUnit = getArguments().getString("unitTime");
 
+        mDelayTime = getArguments().getInt("delayTime");
+        mDelayTimeUnit = getArguments().getString("unitDelayTime");
+
         SensorManager sensorManager = (SensorManager) mView.getContext().getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensorTypeList = sensorManager.getSensorList(Sensor.TYPE_ALL);
 
@@ -78,21 +85,28 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
         }
 
         setUnitTable(type);
-       // mSensorDisplay = getSensorDisplay(type);
+        // mSensorDisplay = getSensorDisplay(type);
         //mSensorDisplay.setUI(mView, mInflater);
 
         int sensorDelay;
+        int sensorBatchDelay;
 
-        if( mSamplingTimeUnit.equals("msec") ) {
+        if (mSamplingTimeUnit.equals("msec")) {
             sensorDelay = mSamplingTime * 1000;
         } else {
             sensorDelay = mSamplingTime * 1000 * 1000;
         }
 
+        if (mDelayTimeUnit.equals("msec")) {
+            sensorBatchDelay = mDelayTime * 1000;
+        } else {
+            sensorBatchDelay = mDelayTime * 1000 * 1000;
+        }
+
         if (mSensor.getType() == Sensor.TYPE_SIGNIFICANT_MOTION) {
             mSensorManager.requestTriggerSensor(mTriggerListener, mSensor);
         } else {
-            mSensorManager.registerListener(this, mSensor, sensorDelay, 0);
+            mSensorManager.registerListener(this, mSensor, sensorDelay, sensorBatchDelay);
         }
 
         return mView;
@@ -123,7 +137,7 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
-    void setUnitTable( int type ) {
+    void setUnitTable(int type) {
         mSensorDisplay.setUnitTimestamp("ns");
         mSensorDisplay.init();
         switch (type) {
@@ -151,7 +165,7 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
 
             case Sensor.TYPE_GYROSCOPE_UNCALIBRATED:
                 mSensorDisplay.setUnitTitleName("x-axis", "y-axis", "z-axis", "x-drift", "y-drift", "z-drift");
-                mSensorDisplay.setUnitName("rad/s",  "rad/s",  "rad/s",   "rad/s",   "rad/s",   "rad/s");
+                mSensorDisplay.setUnitName("rad/s", "rad/s", "rad/s", "rad/s", "rad/s", "rad/s");
                 break;
 
             case Sensor.TYPE_LIGHT:
@@ -166,12 +180,12 @@ public class FragmentSensorDisplay extends Fragment implements SensorEventListen
 
             case Sensor.TYPE_MAGNETIC_FIELD:
                 mSensorDisplay.setUnitTitleName("x-axis", "y-axis", "z-axis");
-                mSensorDisplay.setUnitName("uT",      "uT",     "uT");
+                mSensorDisplay.setUnitName("uT", "uT", "uT");
                 break;
 
             case Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED:
                 mSensorDisplay.setUnitTitleName("x-axis", "y-axis", "z-axis", "x-bias", "y-bias", "z-bias");
-                mSensorDisplay.setUnitName("uT",      "uT",     "uT",      "",        "",        "");
+                mSensorDisplay.setUnitName("uT", "uT", "uT", "", "", "");
                 break;
 
             case Sensor.TYPE_PRESSURE:
