@@ -24,9 +24,12 @@ public class MainActivity extends AppCompatActivity
     private ActionBarDrawerToggle mToggle;
     private NavigationView mNavigationView;
     private boolean mStateSensorListFlag;
-    private int mSelectSamplingTime;
+
     private int mSamplingTime;
     private String mSamplingTimeUnit;
+
+    private int mDelayTime;
+    private String mDelayTimeUnit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,21 +39,27 @@ public class MainActivity extends AppCompatActivity
         mSamplingTime = 1;
         mSamplingTimeUnit = "sec";
 
-        mToolbar         = (Toolbar) findViewById(R.id.toolbar);
-        mDrawer          = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDelayTime = 0;
+        mDelayTimeUnit = "sec";
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
 
         mToggle = new ActionBarDrawerToggle(
                 MainActivity.this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mToggle.syncState();
 
-        mNavigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener)MainActivity.this);
+        mNavigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) MainActivity.this);
 
         FragmentSensorList fragmentSensorList = new FragmentSensorList();
         Bundle args = new Bundle();
         //args.putInt("samplingTime2", mSelectSamplingTime);
         args.putInt("samplingTime", mSamplingTime);
         args.putString("unitTime", mSamplingTimeUnit);
+        args.putInt("delayTime", mDelayTime);
+        args.putString("unitDelayTIme", mDelayTimeUnit);
+
         fragmentSensorList.setArguments(args);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -62,19 +71,41 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDone( String title, String unit, int value ) {
-        mSamplingTime = value;
-        if( unit.equals("0") == true) {
-            mSamplingTimeUnit = "msec";
+    public void onDone(String title, String unit, int value) {
+
+        Bundle args;
+        FragmentSensorList fragmentSensorList;
+
+        if (title.equals("samplingTime")) {
+            mSamplingTime = value;
+            if (unit.equals("0") == true) {
+                mSamplingTimeUnit = "msec";
+            } else {
+                mSamplingTimeUnit = "sec";
+            }
+
+            fragmentSensorList = new FragmentSensorList();
+            args = new Bundle();
+            //args.putInt("samplingTime2", mSelectSamplingTime);
+
         } else {
-            mSamplingTimeUnit = "sec";
+            mDelayTime = value;
+            if (unit.equals("0") == true) {
+                mDelayTimeUnit = "msec";
+            } else {
+                mDelayTimeUnit = "sec";
+            }
+
+            fragmentSensorList = new FragmentSensorList();
+            args = new Bundle();
+            //args.putInt("samplingTime2", mSelectSamplingTime);
+
         }
 
-        FragmentSensorList fragmentSensorList = new FragmentSensorList();
-        Bundle args = new Bundle();
-        //args.putInt("samplingTime2", mSelectSamplingTime);
         args.putInt("samplingTime", mSamplingTime);
         args.putString("unitTime", mSamplingTimeUnit);
+        args.putInt("delayTime", mDelayTime);
+        args.putString("unitDelayTime", mDelayTimeUnit);
 
         fragmentSensorList.setArguments(args);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -84,13 +115,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFragmentSensorListEvent(){
+    public void onFragmentSensorListEvent() {
         mToolbar.setTitle("Sensor List");
         mStateSensorListFlag = true;
     }
 
     @Override
-    public void onFragmentSensorDisplayEvent( String sensorName ){
+    public void onFragmentSensorDisplayEvent(String sensorName) {
         mToggle.setDrawerIndicatorEnabled(false);
         mToolbar.setNavigationIcon(R.drawable.ic_action_back);
         mToolbar.setTitle(sensorName);
@@ -105,7 +136,7 @@ public class MainActivity extends AppCompatActivity
                 mToggle = new ActionBarDrawerToggle(
                         MainActivity.this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
                 mToggle.syncState();
-                mNavigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener)MainActivity.this);
+                mNavigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) MainActivity.this);
 
                 FragmentSensorList fragmentSensorList = new FragmentSensorList();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -113,6 +144,9 @@ public class MainActivity extends AppCompatActivity
                 //args.putInt("samplingTime2", mSelectSamplingTime);
                 args.putInt("samplingTime", mSamplingTime);
                 args.putString("unitTime", mSamplingTimeUnit);
+                args.putInt("delayTime", mDelayTime);
+                args.putString("unitDelayTime", mDelayTimeUnit);
+
                 fragmentSensorList.setArguments(args);
                 transaction.replace(R.id.fragment_container, fragmentSensorList, FragmentSensorList.class.getName());
                 transaction.commit();
@@ -126,33 +160,35 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
 
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            if (drawer.isDrawerOpen(GravityCompat.START)) {
-                drawer.closeDrawer(GravityCompat.START);
-            } else {
-                if( mStateSensorListFlag == false ) {
-                    //super.onBackPressed();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            if (mStateSensorListFlag == false) {
+                //super.onBackPressed();
 
-                    FragmentSensorList fragmentSensorList = new FragmentSensorList();
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    Bundle args = new Bundle();
-                    //args.putInt("samplingTime2", mSelectSamplingTime);
-                    args.putInt("samplingTime", mSamplingTime);
-                    args.putString("unitTime", mSamplingTimeUnit);
-                    fragmentSensorList.setArguments(args);
-                    transaction.replace(R.id.fragment_container, fragmentSensorList, FragmentSensorList.class.getName());
-                    transaction.commit();
+                FragmentSensorList fragmentSensorList = new FragmentSensorList();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                Bundle args = new Bundle();
+                //args.putInt("samplingTime2", mSelectSamplingTime);
+                args.putInt("samplingTime", mSamplingTime);
+                args.putString("unitTime", mSamplingTimeUnit);
+                args.putInt("delayTime", mDelayTime);
+                args.putString("unitDelayTime", mDelayTimeUnit);
+                fragmentSensorList.setArguments(args);
+                transaction.replace(R.id.fragment_container, fragmentSensorList, FragmentSensorList.class.getName());
+                transaction.commit();
 
-                    mToolbar.setTitle("Sensor List");
-                    mToggle.setDrawerIndicatorEnabled(true);
-                    mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                    mToggle = new ActionBarDrawerToggle(
-                            MainActivity.this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-                    mToggle.syncState();
-                    mNavigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) MainActivity.this);
-                    mStateSensorListFlag = true;
-                }
+                mToolbar.setTitle("Sensor List");
+                mToggle.setDrawerIndicatorEnabled(true);
+                mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                mToggle = new ActionBarDrawerToggle(
+                        MainActivity.this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                mToggle.syncState();
+                mNavigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) MainActivity.this);
+                mStateSensorListFlag = true;
             }
+        }
 
     }
 
@@ -185,18 +221,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            FragmentNumberDialog myDiag = FragmentNumberDialog.newInstance(5, mSamplingTime, mSamplingTimeUnit, "SamplingTime");
+            FragmentNumberDialog myDiag = FragmentNumberDialog.newInstance(5, mSamplingTime, mSamplingTimeUnit, "samplingTime");
             myDiag.show(getFragmentManager(), "Diag");
-        //}
-            // Handle the camera action
-            /*FragmentManager manager = getFragmentManager();
-            FragmentSamplingTimeDialog dialog = new FragmentSamplingTimeDialog();
-
-            Bundle bundle = new Bundle();
-            bundle.putInt(FragmentSamplingTimeDialog.SELECTED, mSelectSamplingTime);
-            dialog.setArguments(bundle);
-            dialog.show(manager, "Dialog");*/
-
+        } else if (id == R.id.nav_batch) {
+            FragmentNumberDialog myDiag = FragmentNumberDialog.newInstance(5, mDelayTime, mDelayTimeUnit, "delayTime");
+            myDiag.show(getFragmentManager(), "Diag");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
