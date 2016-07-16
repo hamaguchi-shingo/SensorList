@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity
         args.putInt("samplingTime", mSamplingTime);
         args.putString("unitTime", mSamplingTimeUnit);
         args.putInt("delayTime", mDelayTime);
-        args.putString("unitDelayTIme", mDelayTimeUnit);
+        args.putString("unitDelayTime", mDelayTimeUnit);
 
         fragmentSensorList.setArguments(args);
 
